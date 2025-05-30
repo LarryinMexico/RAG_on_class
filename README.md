@@ -9,6 +9,14 @@
 - 📝 一鍵生成練習題和標準答案
 - 🔍 使用 Sentence-BERT 進行語義檢索
 - 🧠 整合 Groq API 生成智能回答
+- 🌐 前後端分離架構
+
+## 系統架構
+
+- **後端**: 使用 FastAPI 建立 RESTful API
+- **前端**: 純 HTML/CSS/JavaScript 實現
+- **資料處理**: Sentence-BERT + 餘弦相似度檢索
+- **AI 生成**: 整合 Groq API (LLama3-70B)
 
 ## 安裝與設置
 
@@ -38,12 +46,44 @@ GROQ_API_KEY=your_api_key_here
 
 ## 使用方法
 
-運行應用程序：
+### 啟動後端 API 服務
+
+Linux/Mac:
 ```bash
-python main.py
+chmod +x start.sh
+./start.sh
 ```
 
-然後在瀏覽器中訪問 http://localhost:7860
+Windows:
+```bash
+start.bat
+```
+
+或者直接運行:
+```bash
+python backend.py
+```
+
+後端 API 將在 http://localhost:8000 啟動
+
+### 使用前端
+
+直接在瀏覽器中打開 `frontend/index.html` 文件，或使用簡易的 HTTP 服務器:
+
+```bash
+# Python 3 內建的 HTTP 服務器
+cd frontend
+python -m http.server 8080
+```
+
+然後在瀏覽器中訪問 http://localhost:8080
+
+## API 端點
+
+- `POST /api/upload` - 上傳課程文件
+- `POST /api/query` - 提交問題
+- `POST /api/generate-questions` - 生成練習題
+- `GET /api/clear-data` - 清除所有數據
 
 ## 系統流程
 
