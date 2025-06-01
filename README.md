@@ -20,7 +20,7 @@
 
 ## 安裝與設置
 
-1. 克隆此倉庫
+1. 複製到本地
 ```bash
 git clone https://github.com/LarryinMexico/RAG_on_class.git
 cd RAG_on_class
@@ -66,17 +66,6 @@ python backend.py
 
 後端 API 將在 http://localhost:8000 啟動
 
-### 使用前端
-
-直接在瀏覽器中打開 `frontend/index.html` 文件，或使用簡易的 HTTP 服務器:
-
-```bash
-# Python 3 內建的 HTTP 服務器
-cd frontend
-python -m http.server 8080
-```
-
-然後在瀏覽器中訪問 http://localhost:8080
 
 ## API 端點
 
