@@ -6,19 +6,21 @@
     <title>RAG ON CLASS - 課程問答系統</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- 添加 Marked.js 庫用於 Markdown 渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📚 RAG ON CLASS - 課程問答系統</h1>
-            <p>上傳您的課程資料，然後詢問任何相關問題！</p>
+            <h1>RAG ON CLASS - 課程問答系統</h1>
+            <p>上傳您的課程資料，然後詢問任何相關問題～</p>
         </header>
         
         <div class="tabs">
             <div class="tab-buttons">
                 <button class="tab-button active" data-tab="upload">📁 資料上傳</button>
-                <button class="tab-button" data-tab="query">❓ 作答系統</button>
-                <button class="tab-button" data-tab="questions">📝 一鍵生成題目</button>
+                <button class="tab-button" data-tab="query">❓ 問答系統</button>
+                <button class="tab-button" data-tab="questions">🤓 一鍵生成題目</button>
                 <button class="tab-button" data-tab="about">ℹ️ 系統資訊</button>
             </div>
             
@@ -27,27 +29,98 @@
                 <div id="upload" class="tab-pane active">
                     <h2>上傳課程文件</h2>
                     <div class="upload-area">
-                        <input type="file" id="file-input" multiple accept=".txt">
+                        <input type="file" id="file-input" multiple accept=".txt,.pdf">
                         <label for="file-input" class="file-label">
                             <span>選擇文件</span>
-                            <span class="small-text">(支援多個 .txt 文件)</span>
+                            <span class="small-text">(支援 .txt 和 .pdf 文件)</span>
                         </label>
                         <div id="file-list" class="file-list"></div>
                     </div>
                     <button id="upload-btn" class="primary-btn">處理上傳的文件</button>
                     <div id="upload-status" class="status-message"></div>
+                    
+                    <div class="processing-preview">
+                        <h3>文件處理預覽</h3>
+                        <div class="preview-container" style="margin-bottom: 1.5rem;">
+                            <div class="preview-box full-width">
+                                <h4>處理後的文件內容</h4>
+                                <div class="file-content-preview">
+                                    <div class="content-tabs">
+                                        <button class="content-tab active" data-content="text">文本內容</button>
+                                        <button class="content-tab" data-content="json">JSON 結構</button>
+                                    </div>
+                                    <div id="file-content" class="file-content">
+                                        <p class="no-data">尚未處理任何文件。處理完成後將顯示文件內容。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-container">
+                            <div class="preview-box">
+                                <h4>處理流程</h4>
+                                <div class="process-flow">
+                                    <div class="process-step">
+                                        <div class="step-icon">1️⃣</div>
+                                        <div class="step-content">
+                                            <h5>文本提取</h5>
+                                            <p>從上傳的文件中提取純文本內容。對於PDF文件，使用PyPDF2提取文字，若無法提取則使用Tesseract OCR進行識別。</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="step-icon">2️⃣</div>
+                                        <div class="step-content">
+                                            <h5>文本分割</h5>
+                                            <p>將提取的文本分割成約150字的小段落，確保每個段落包含完整的語義信息。</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="step-icon">3️⃣</div>
+                                        <div class="step-content">
+                                            <h5>向量化處理</h5>
+                                            <p>使用Sentence-BERT模型(all-mpnet-base-v2)將每個文本段落轉換為高維向量，用於後續的語義檢索。</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="step-icon">4️⃣</div>
+                                        <div class="step-content">
+                                            <h5>數據存儲</h5>
+                                            <p>將處理後的文本段落和向量存儲在服務器上，以便快速檢索和使用。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="preview-box">
+                                <h4>文件處理結果</h4>
+                                <div id="processing-result" class="processing-result">
+                                    <p class="no-data">尚未處理任何文件。請上傳文件並點擊「處理上傳的文件」按鈕。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- 問答系統區塊 -->
                 <div id="query" class="tab-pane">
-                    <h2>課程問答系統</h2>
-                    <div class="query-area">
-                        <textarea id="question-input" placeholder="請輸入您的問題，例如：什麼是機器學習？"></textarea>
-                        <button id="query-btn" class="primary-btn">提交問題</button>
+                    <div class="chat-container">
+                        <!-- 對話歷史區域 -->
+                        <div id="chat-history" class="chat-history">
+                            <!-- 這裡會動態填充對話內容 -->
+                        </div>
+                        
+                        <div class="chat-controls">
+                            <textarea id="question-input" placeholder="請輸入您的問題，例如：什麼是機器學習？"></textarea>
+                            <div class="chat-buttons">
+                                <button id="query-btn" class="primary-btn">提交問題</button>
+                                <button id="clear-chat-btn" class="secondary-btn">清空對話</button>
+                            </div>
+                            <div id="chat-status" class="status-message"></div>
+                        </div>
                     </div>
+                    
                     <div class="response-area">
                         <div class="response-box">
-                            <h3>回答</h3>
+                            <h3>當前回答</h3>
                             <div id="answer-output" class="output-box"></div>
                         </div>
                         <div class="response-box">
@@ -60,22 +133,24 @@
                 <!-- 生成題目區塊 -->
                 <div id="questions" class="tab-pane">
                     <h2>一鍵生成題目</h2>
-                    <div class="questions-area">
-                        <div class="input-group">
-                            <label for="num-questions">題目數量:</label>
-                            <input type="number" id="num-questions" min="1" max="10" value="5">
+                    <div class="questions-section">
+                        <div class="questions-header">
+                            <div class="questions-controls">
+                                <label for="num-questions">生成數量：</label>
+                                <input type="number" id="num-questions" min="1" max="20" value="3">
+                                <button id="generate-questions-btn" class="primary-btn" onclick="generateQuestions(); return false;">生成測驗題目</button>
+                            </div>
+                            <div id="questions-status" class="status-message"></div>
                         </div>
-                        <button id="generate-btn" class="primary-btn">生成題目</button>
-                    </div>
-                    <div class="questions-display">
-                        <div class="response-box">
-                            <h3>生成的題目</h3>
-                            <div id="questions-output" class="output-box"></div>
-                        </div>
-                        <button id="show-answers-btn" class="secondary-btn">顯示標準答案</button>
-                        <div id="answers-container" class="response-box" style="display: none;">
-                            <h3>標準答案</h3>
-                            <div id="answers-output" class="output-box"></div>
+                        <div class="output-box" id="questions-output">
+                            <div class="questions-display" id="questions-display"></div>
+                            <!-- 結果區域 -->
+                            <div class="results-area"></div>
+                            
+                            <!-- 檢查答案按鈕移到底部 -->
+                            <div class="bottom-controls" style="display: none; margin-top: 1.5rem; text-align: center; padding: 1rem;">
+                                <button id="check-answers-btn" class="primary-btn">檢查答案</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -91,6 +166,7 @@
                                 <li><strong>處理資料</strong>：點擊「處理上傳的文件」按鈕，系統會自動分割文本並生成嵌入向量</li>
                                 <li><strong>提問</strong>：在「作答系統」標籤中輸入您的問題</li>
                                 <li><strong>獲得回答</strong>：系統會檢索相關內容並生成回答</li>
+                                <li><strong>對話紀錄</strong>：系統會保存您的對話歷史，方便追蹤問題脈絡</li>
                                 <li><strong>一鍵生成題目/答案</strong>：在「一鍵生成題目」標籤點擊按鈕自動生成題目與標準答案</li>
                             </ol>
                         </section>
@@ -102,14 +178,7 @@
                                 <li>📊 餘弦相似度匹配最相關內容</li>
                                 <li>💾 本地儲存處理後的資料</li>
                                 <li>🌐 前後端分離架構</li>
-                            </ul>
-                        </section>
-                        <section>
-                            <h3>注意事項</h3>
-                            <ul>
-                                <li>請確保在 .env 文件中設定 GROQ_API_KEY</li>
-                                <li>支援的文件格式：.txt</li>
-                                <li>系統會將文本分割成約150字的段落進行處理</li>
+                                <li>💬 對話歷史保存功能</li>
                             </ul>
                         </section>
                     </div>
